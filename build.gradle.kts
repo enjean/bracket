@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.9.22"
 }
 
 group = "org.example"
@@ -10,13 +10,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
 tasks.test {
     useJUnitPlatform()
 }
-
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(11)
 }

@@ -28,6 +28,7 @@ class TeamScenarioGenerator(
                 teamSeed = teamSeed,
                 points = 0,
                 probability = 1.0,
+                gameProbability = 1.0,
                 pastWins = emptyList(),
             )
         )

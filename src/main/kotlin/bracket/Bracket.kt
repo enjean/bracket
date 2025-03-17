@@ -28,23 +28,41 @@ fun calculateNewScenarios(
     team2Scenarios: List<Scenario>,
     round: Int
 ): List<Scenario> {
-    val allScenarios = team1Scenarios.flatMap { team1Scenario ->
-        team2Scenarios.flatMap { team2Scenario ->
-            listOf(
-                calculateNewScenario(
-                    winningTeamScenario = team1Scenario,
-                    losingTeamScenario = team2Scenario,
-                    round = round,
-                ),
-                calculateNewScenario(
-                    winningTeamScenario = team2Scenario,
-                    losingTeamScenario = team1Scenario,
-                    round = round,
-                ),
-            )
-        }
-    }.sortedByDescending(Scenario::expectedPoints)
-    return if (allScenarios.size > 4) allScenarios.take((allScenarios.size * 0.4).toInt()) else allScenarios
+//    val allScenarios = team1Scenarios.flatMap { team1Scenario ->
+//        team2Scenarios.flatMap { team2Scenario ->
+//            listOf(
+//                calculateNewScenario(
+//                    winningTeamScenario = team1Scenario,
+//                    losingTeamScenario = team2Scenario,
+//                    round = round,
+//                ),
+//                calculateNewScenario(
+//                    winningTeamScenario = team2Scenario,
+//                    losingTeamScenario = team1Scenario,
+//                    round = round,
+//                ),
+//            )
+//        }
+//    }.sortedByDescending(Scenario::expectedPoints)
+//    return if (allScenarios.size > 4) allScenarios.take((allScenarios.size * 0.4).toInt()) else allScenarios
+    val team1Scenario = team1Scenarios.single()
+    val team2Scenario = team2Scenarios.single()
+    val bothScenarios = listOf(
+        calculateNewScenario(
+            winningTeamScenario = team1Scenario,
+            losingTeamScenario = team2Scenario,
+            round = round,
+        ),
+        calculateNewScenario(
+            winningTeamScenario = team2Scenario,
+            losingTeamScenario = team1Scenario,
+            round = round,
+        )
+    ).sortedByDescending(Scenario::gameProbability)
+//    val singleScenario = bothScenarios.first()
+    val scenario1 = bothScenarios.first()
+    val singleScenario = if (scenario1.gameProbability > 0.67) scenario1 else bothScenarios.last()
+    return listOf(singleScenario)
 }
 
 fun calculateNewScenario(
@@ -62,6 +80,7 @@ fun calculateNewScenario(
     return winningTeamScenario.copy(
         points = winningTeamScenario.points + losingTeamScenario.points + pointsForWin,
         probability = winningTeamScenario.probability * losingTeamScenario.probability * winProbability,
+        gameProbability = winProbability,
         pastWins = winningTeamScenario.pastWins + losingTeamScenario.pastWins + "${winningTeamScenario.team.name} def ${losingTeamScenario.team.name} - $winProbability $pointsForWin"
     )
 }
@@ -157,87 +176,171 @@ fun buildRegion(
     )
 
 fun main() {
-    val south = buildRegion(
+//    val south = buildRegion(
+//        listOf(
+//            listOf(MensTeams2024.houston),
+//            listOf(MensTeams2024.marquette),
+//            listOf(MensTeams2024.kentucky),
+//            listOf(MensTeams2024.duke),
+//            listOf(MensTeams2024.wisconsin),
+//            listOf(MensTeams2024.texasTech),
+//            listOf(MensTeams2024.florida),
+//            listOf(MensTeams2024.nebraska),
+//            listOf(MensTeams2024.tamu),
+//            listOf(MensTeams2024.colorado),
+//            listOf(MensTeams2024.ncState),
+//            listOf(MensTeams2024.jmu),
+//            listOf(MensTeams2024.vermont),
+//            listOf(MensTeams2024.oakland),
+//            listOf(MensTeams2024.westernKY),
+//            listOf(MensTeams2024.longwood),
+//        )
+//    )
+//
+//    val east = buildRegion(
+//        listOf(
+//            listOf(MensTeams2024.connecticut),
+//            listOf(MensTeams2024.iowaSt),
+//            listOf(MensTeams2024.illinois),
+//            listOf(MensTeams2024.auburn),
+//            listOf(MensTeams2024.sanDiegoSt),
+//            listOf(MensTeams2024.byu),
+//            listOf(MensTeams2024.washSt),
+//            listOf(MensTeams2024.fau),
+//            listOf(MensTeams2024.northwestern),
+//            listOf(MensTeams2024.drake),
+//            listOf(MensTeams2024.duquesne),
+//            listOf(MensTeams2024.uab),
+//            listOf(MensTeams2024.yale),
+//            listOf(MensTeams2024.moreheadSt),
+//            listOf(MensTeams2024.southDakotaSt),
+//            listOf(MensTeams2024.stetson),
+//        )
+//    )
+//
+//    val midwest = buildRegion(
+//        listOf(
+//            listOf(MensTeams2024.purdue),
+//            listOf(MensTeams2024.tennessee),
+//            listOf(MensTeams2024.creighton),
+//            listOf(MensTeams2024.kansas),
+//            listOf(MensTeams2024.gonzaga),
+//            listOf(MensTeams2024.southCarolina),
+//            listOf(MensTeams2024.texas),
+//            listOf(MensTeams2024.utahSt),
+//            listOf(MensTeams2024.tcu),
+//            listOf(MensTeams2024.coloradoSt),
+//            listOf(MensTeams2024.oregon),
+//            listOf(MensTeams2024.mcNeeseSt),
+//            listOf(MensTeams2024.samford),
+//            listOf(MensTeams2024.akron),
+//            listOf(MensTeams2024.stPeters),
+//            listOf(MensTeams2024.grambling),
+//        )
+//    )
+//
+//    val west = buildRegion(
+//        listOf(
+//            listOf(MensTeams2024.northCarolina),
+//            listOf(MensTeams2024.arizona),
+//            listOf(MensTeams2024.baylor),
+//            listOf(MensTeams2024.alabama),
+//            listOf(MensTeams2024.saintMarys),
+//            listOf(MensTeams2024.clemson),
+//            listOf(MensTeams2024.dayton),
+//            listOf(MensTeams2024.missSt),
+//            listOf(MensTeams2024.michSt),
+//            listOf(MensTeams2024.nevada),
+//            listOf(MensTeams2024.newMexico),
+//            listOf(MensTeams2024.grandCanyon),
+//            listOf(MensTeams2024.charleston),
+//            listOf(MensTeams2024.colgate),
+//            listOf(MensTeams2024.longBeachSt),
+//            listOf(MensTeams2024.wagner),
+//        )
+//    )
+
+    val albany1 = buildRegion(
         listOf(
-            listOf(MensTeams.alabama),
-            listOf(MensTeams.arizona),
-            listOf(MensTeams.baylor),
-            listOf(MensTeams.virginia),
-            listOf(MensTeams.sdsu),
-            listOf(MensTeams.creighton),
-            listOf(MensTeams.missouri),
-            listOf(MensTeams.maryland),
-            listOf(MensTeams.wvu),
-            listOf(MensTeams.utahSt),
-            listOf(MensTeams.ncSt),
-            listOf(MensTeams.charleston),
-            listOf(MensTeams.furman),
-            listOf(MensTeams.ucsb),
-            listOf(MensTeams.princeton),
-            listOf(MensTeams.tamuCC),
+            listOf(WomensTeams2024.southCarolina),
+            listOf(WomensTeams2024.notreDame),
+            listOf(WomensTeams2024.oregonSt),
+            listOf(WomensTeams2024.indiana),
+            listOf(WomensTeams2024.oklahoma),
+            listOf(WomensTeams2024.nebraska),
+            listOf(WomensTeams2024.oleMiss),
+            listOf(WomensTeams2024.northCarolina),
+            listOf(WomensTeams2024.michSt),
+            listOf(WomensTeams2024.marquette),
+            listOf(WomensTeams2024.tamu),
+            listOf(WomensTeams2024.fgcu),
+            listOf(WomensTeams2024.fairfield),
+            listOf(WomensTeams2024.easternWashington),
+            listOf(WomensTeams2024.kentSt),
+            listOf(WomensTeams2024.presbyterian),
         )
     )
 
-    val east = buildRegion(
+    val portland4 = buildRegion(
         listOf(
-            listOf(MensTeams.purdue),
-            listOf(MensTeams.marquette),
-            listOf(MensTeams.kansasSt),
-            listOf(MensTeams.tennessee),
-            listOf(MensTeams.duke),
-            listOf(MensTeams.kentucky),
-            listOf(MensTeams.michiganSt),
-            listOf(MensTeams.memphis),
-            listOf(MensTeams.fau),
-            listOf(MensTeams.usc),
-            listOf(MensTeams.providence),
-            listOf(MensTeams.oralRoberts),
-            listOf(MensTeams.uLaLa),
-            listOf(MensTeams.montanaSt),
-            listOf(MensTeams.vermont),
-            listOf(MensTeams.fDickinson),
+            listOf(WomensTeams2024.texas),
+            listOf(WomensTeams2024.stanford),
+            listOf(WomensTeams2024.ncState),
+            listOf(WomensTeams2024.gonzaga),
+            listOf(WomensTeams2024.utah),
+            listOf(WomensTeams2024.tennessee),
+            listOf(WomensTeams2024.iowaSt),
+            listOf(WomensTeams2024.alabama),
+            listOf(WomensTeams2024.floridaSt),
+            listOf(WomensTeams2024.maryland),
+            listOf(WomensTeams2024.greenBay),
+            listOf(WomensTeams2024.southDakotaSt),
+            listOf(WomensTeams2024.ucIrvine),
+            listOf(WomensTeams2024.chattanooga),
+            listOf(WomensTeams2024.norfolkSt),
+            listOf(WomensTeams2024.drexel),
         )
     )
 
-    val midwest = buildRegion(
+    val albany2 = buildRegion(
         listOf(
-            listOf(MensTeams.houston),
-            listOf(MensTeams.texas),
-            listOf(MensTeams.xavier),
-            listOf(MensTeams.indiana),
-            listOf(MensTeams.miami),
-            listOf(MensTeams.iowaState),
-            listOf(MensTeams.texasAM),
-            listOf(MensTeams.iowa),
-            listOf(MensTeams.auburn),
-            listOf(MensTeams.pennState),
-            listOf(MensTeams.pitt),
-            listOf(MensTeams.drake),
-            listOf(MensTeams.kentState),
-            listOf(MensTeams.kennState),
-            listOf(MensTeams.colgate),
-            listOf(MensTeams.nKentucky),
+            listOf(WomensTeams2024.iowa),
+            listOf(WomensTeams2024.ucla),
+            listOf(WomensTeams2024.lsu),
+            listOf(WomensTeams2024.kansasSt),
+            listOf(WomensTeams2024.colorado),
+            listOf(WomensTeams2024.louisville),
+            listOf(WomensTeams2024.creighton),
+            listOf(WomensTeams2024.westVA),
+            listOf(WomensTeams2024.princeton),
+            listOf(WomensTeams2024.unlv),
+            listOf(WomensTeams2024.middleTennessee),
+            listOf(WomensTeams2024.drake),
+            listOf(WomensTeams2024.portland),
+            listOf(WomensTeams2024.rice),
+            listOf(WomensTeams2024.californiaBaptist),
+            listOf(WomensTeams2024.holyCross),
         )
     )
 
-    val west = buildRegion(
+    val portland3 = buildRegion(
         listOf(
-            listOf(MensTeams.kansas),
-            listOf(MensTeams.ucla),
-            listOf(MensTeams.gonzaga),
-            listOf(MensTeams.uconn),
-            listOf(MensTeams.stMarys),
-            listOf(MensTeams.tcu),
-            listOf(MensTeams.northwestern),
-            listOf(MensTeams.arkansas),
-            listOf(MensTeams.illinois),
-            listOf(MensTeams.boiseSt),
-            listOf(MensTeams.arizonaSt),
-            listOf(MensTeams.vcu),
-            listOf(MensTeams.iona),
-            listOf(MensTeams.grCanyon),
-            listOf(MensTeams.uncAsh),
-            listOf(MensTeams.howard),
+            listOf(WomensTeams2024.usc),
+            listOf(WomensTeams2024.ohioSt),
+            listOf(WomensTeams2024.uconn),
+            listOf(WomensTeams2024.virginiaTech),
+            listOf(WomensTeams2024.baylor),
+            listOf(WomensTeams2024.syracuse),
+            listOf(WomensTeams2024.duke),
+            listOf(WomensTeams2024.kansas),
+            listOf(WomensTeams2024.michigan),
+            listOf(WomensTeams2024.richmond),
+            listOf(WomensTeams2024.auburn),
+            listOf(WomensTeams2024.vanderbilt),
+            listOf(WomensTeams2024.marshall),
+            listOf(WomensTeams2024.jacksonSt),
+            listOf(WomensTeams2024.maine),
+            listOf(WomensTeams2024.tamuCC),
         )
     )
 
@@ -246,13 +349,13 @@ fun main() {
             round = 6,
             team1ScenarioGenerator = GameScenarioGenerator(
                 round = 5,
-                team1ScenarioGenerator = south,
-                team2ScenarioGenerator = east,
+                team1ScenarioGenerator = albany1,
+                team2ScenarioGenerator = portland4,
             ),
             team2ScenarioGenerator = GameScenarioGenerator(
                 round = 5,
-                team1ScenarioGenerator = midwest,
-                team2ScenarioGenerator = west,
+                team1ScenarioGenerator = albany2,
+                team2ScenarioGenerator = portland3,
             )
         )
     val bracketScenarios = bracket.getScenarios()
